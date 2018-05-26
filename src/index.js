@@ -3,12 +3,13 @@ const IO = require('socket.io')
 const io = IO()
 
 const players = []
+const sockets = []
 
 io.on('connection', function(socket){
   console.log('user connected')
 
   socket.on('signIn', id => {
-    console.log('signIn:', id)
+    console.log('signIn', id)
 
     const player = players.find(player => player.id === id)
 
@@ -20,8 +21,20 @@ io.on('connection', function(socket){
       }
       players.push(newPlayer)
     }
+
     socket.emit('signInSuccess', JSON.stringify(players))
 
+    sockets.forEach(
+      socket => socket.socket.emit(
+        'userSignedIn',
+        JSON.stringify(players.find(_ => _.id === id))
+      )
+    )
+
+    sockets.push({
+      playerId: id,
+      socket,
+    })
   })
 
   socket.on('move', msg => {
@@ -32,6 +45,13 @@ io.on('connection', function(socket){
     player.x = movedPlayer.x
     player.y = movedPlayer.y
     console.log('moved player', movedPlayer)
+
+    sockets.filter(_ => _.playerId !== movedPlayer.id).forEach(
+      socket => socket.socket.emit(
+        'updatePlayerPosition',
+        JSON.stringify(movedPlayer)
+      )
+    )
 
   })
 })
