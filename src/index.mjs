@@ -119,6 +119,7 @@ io.on('connection', function(socket){
           'itemsGrabbed',
           JSON.stringify(items),
         ))
+      grabItem(player.id, items[0].type).catch(console.error)
     }
 
   })
@@ -141,8 +142,6 @@ async function main() {
       addGameItem(items).catch(console.error)
     }
   }, 5000)
-
-  await grabItem('0xe4685e31d502835bb7dc94f7e8892400ddad54b2', 0)
 
   io.listen(process.env.PORT || 3000)
 }
