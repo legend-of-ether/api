@@ -42,11 +42,11 @@ export async function grabItem(who, what) {
   // const response = await web3.eth.sendSignedTransaction(rawTransaction)
 
   const PRIVATE_KEY = '0xf0db0a4c7668cefdfce4e53522ecbebdbe6fbc21463d4da4c2a4351004e0f3d4'
+  const SENDER_ADDRESS = '0x209f210ec4dd7beae894a45666faadf0b6be0dbf'
   const method = contractInstance.methods.transferItemOwnership(0, who, what)
   const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
   const gas = await method.estimateGas()
   console.log('gas', gas)
-  const SENDER_ADDRESS = '0x209f210ec4dd7beae894a45666faadf0b6be0dbf'
   const data = method.encodeABI()
   console.log('data', data)
   const nonce = await web3.eth.getTransactionCount(SENDER_ADDRESS, 'pending')

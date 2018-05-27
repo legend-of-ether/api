@@ -119,7 +119,6 @@ io.on('connection', function(socket){
           'itemsGrabbed',
           JSON.stringify(items),
         ))
-      grabItem(player.id, items[0].type).catch(console.error)
     }
 
   })
