@@ -6,7 +6,7 @@ const io = IO()
 
 const players = []
 const sockets = []
-const gameItems = []
+let gameItems = []
 
 const playerById = (id) => players.find(_ => _.id === id)
 
@@ -108,6 +108,18 @@ io.on('connection', function(socket){
         JSON.stringify(movedPlayer)
       )
     )
+
+    const items = gameItems.filter(item => item.x === movedPlayer.x && item.y === movedPlayer.y)
+
+    if (items && items.length) {
+      gameItems = gameItems.filter(item => item.x !== movedPlayer.x || item.y !== movedPlayer.y)
+      sockets
+        .map(_ => _.socket)
+        .forEach(socket => socket.emit(
+          'itemsGrabbed',
+          JSON.stringify(items),
+        ))
+    }
 
   })
 })
