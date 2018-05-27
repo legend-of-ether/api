@@ -6,7 +6,7 @@ const io = IO()
 
 const players = []
 const sockets = []
-const items = []
+const gameItems = []
 
 const playerById = (id) => players.find(_ => _.id === id)
 
@@ -68,7 +68,10 @@ io.on('connection', function(socket){
     const player = signIn(id)
     const stringifiedPlayer = JSON.stringify(player)
 
-    socket.emit('signInSuccess', JSON.stringify(players))
+    socket.emit('signInSuccess', JSON.stringify({
+      players,
+      gameItems,
+    }))
 
     const emitUserSignedIn = socket => socket.emit(
       'userSignedIn',
@@ -109,8 +112,6 @@ io.on('connection', function(socket){
   })
 })
 
-io.listen(process.env.PORT || 3000)
-
 async function main() {
   const items = await getItems()
   const itemCounts = await getAllPoolItemCounts(items)
@@ -122,6 +123,36 @@ async function main() {
 
   console.log(`The contract has ${items.length} items:`, JSON.stringify(items, null, 2))
   console.log(`The pool has the following amounts of items:`, JSON.stringify(hydratedItemCounts, null, 2))
+
+  setInterval(() => {
+    if (gameItems.length < 4) {
+      addGameItem(items).catch(console.error)
+    }
+  }, 5000)
+
+  io.listen(process.env.PORT || 3000)
+}
+
+async function addGameItem(items) {
+  const newItem = {
+    type: Math.floor(Math.random() * items.length),
+    x: Math.floor(Math.random() * 15),
+    y: Math.floor(Math.random() * 15),
+  }
+  const stringifiedNewItem = JSON.stringify(newItem)
+
+  gameItems.push(newItem)
+
+  const emitNewItem = socket => socket.emit(
+    'newItem',
+    stringifiedNewItem,
+  )
+
+  sockets
+    .map(hydratePlayerSocket)
+    .filter(_ => _.player.connected)
+    .map(_ => _.socket)
+    .forEach(emitNewItem)
 }
 
 main().catch(console.error)
