@@ -1,9 +1,18 @@
-const IO = require('socket.io')
+import IO from 'socket.io'
+import { movePlayer, isConnected } from './helper'
 
 const io = IO()
 
 const players = []
 const sockets = []
+const items = []
+
+const playerById = (id) => players.find(_ => _.id === id)
+
+const hydratePlayerSocket = ({socket, playerId}) => ({
+  player: playerById(playerId),
+  socket,
+})
 
 io.on('connection', function(socket){
   console.log('user connected')
@@ -80,6 +89,10 @@ io.on('connection', function(socket){
     const json = JSON.parse(msg)
     console.log('move: ', json)
     const player = players.find(player => player.id === json.id)
+    if (!player) {
+      console.error('ERROR: moving a player that does not exist?', json)
+      return
+    }
     const movedPlayer = movePlayer(player, json.direction)
     player.x = movedPlayer.x
     player.y = movedPlayer.y
@@ -96,26 +109,3 @@ io.on('connection', function(socket){
 })
 
 io.listen(process.env.PORT || 3000)
-
-function movePlayer(player, direction) {
-  return {
-    ...player,
-    x: minMax(0, 14, player.x + directionToNumberX(direction)),
-    y: minMax(0, 14, player.y + directionToNumberY(direction)),
-  }
-}
-
-const minMax = (min, max, val) => Math.min(Math.max(val, min), max)
-
-const directionToNumberX = arrow => arrow === 'Right' ? 1 : arrow === 'Left' ? -1 : 0
-
-const directionToNumberY = arrow => arrow === 'Down' ? 1 : arrow === 'Up' ? -1 : 0
-
-const playerById = (id) => players.find(_ => _.id === id)
-
-const hydratePlayerSocket = ({socket, playerId}) => ({
-  player: playerById(playerId),
-  socket,
-})
-
-const isConnected = player => player.connected
