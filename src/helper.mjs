@@ -1,7 +1,7 @@
 export const movePlayer = (player, direction) => ({
   ...player,
   x: minMax(0, 14, player.x + directionToNumberX(direction)),
-  y: minMax(0, 14, player.y + directionToNumberY(direction)),
+  y: minMax(0, 9, player.y + directionToNumberY(direction)),
 })
 
 export const minMax = (min, max, val) => Math.min(Math.max(val, min), max)

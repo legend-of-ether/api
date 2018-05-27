@@ -150,7 +150,7 @@ async function addGameItem(items) {
   const newItem = {
     type: Math.floor(Math.random() * items.length),
     x: Math.floor(Math.random() * 15),
-    y: Math.floor(Math.random() * 15),
+    y: Math.floor(Math.random() * 10),
   }
   const stringifiedNewItem = JSON.stringify(newItem)
 
