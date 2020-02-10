@@ -1,7 +1,7 @@
 import contract from '@legend-of-ether/sol'
 import Web3 from 'web3'
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/'))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/25915a33d3264e5d975f8759231b9d10'))
 
 export const contractInstance = new web3.eth.Contract(contract.abi, contract.networks['3'].address, { from: '0x209f210ec4dd7beae894a45666faadf0b6be0dbf' })
 
