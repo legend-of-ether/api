@@ -23,16 +23,18 @@ export async function getItems() {
 }
 
 export async function grabItem(who, what) {
-  console.log('grabItem', who, what)
+  console.log('grabItem', { who, what })
   console.log('contract address', contract.networks['3'].address)
 
-  const PRIVATE_KEY = '0xf0db0a4c7668cefdfce4e53522ecbebdbe6fbc21463d4da4c2a4351004e0f3d4'
-  const SENDER_ADDRESS = '0x209f210ec4dd7beae894a45666faadf0b6be0dbf'
+  const { PRIVATE_KEY } = process.env
+  const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
+
+  console.log({ account })
+
   const method = contractInstance.methods.addItem(who, what)
   const gas = await method.estimateGas()
-  const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
   const data = method.encodeABI()
-  const nonce = await web3.eth.getTransactionCount(SENDER_ADDRESS, 'pending')
+  const nonce = await web3.eth.getTransactionCount(account.address, 'pending')
   const payload = {
     nonce,
     data,
